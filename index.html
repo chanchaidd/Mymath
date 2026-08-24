@@ -8,14 +8,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>เกมคณิตศาสตร์: ตะลุยโจทย์เลข 10 (จับเวลา 1 นาที)</title>
     <style>
-        * { box-sizing: border-box; font-family: 'Sarabun', 'Tahoma', sans-serif; }
+        { box-sizing: border-box; font-family: 'Sarabun', 'Tahoma', sans-serif; }
         body { background-color: #f0f4f8; color: #2d3748; margin: 0; padding: 18px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
         .container { background: #ffffff; border-radius: 16px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); max-width: 500px; width: 100%; padding: 30px; text-align: center; }
-        h1 { color: #2b6cb0; margin-top: 0; font-size: 20px; }
-        .header-status { display: flex; justify-content: space-between; font-size: 16px; font-weight: bold; margin-bottom: 18px; background: #ebf8ff; padding: 12px 20px; border-radius: 10px; color: #2c5282; }
-        .timer-bar-container { width: 100%; background-color: #e2e8f0; height: 14px; border-radius: 7px; overflow: hidden; margin-bottom: 25px; }
+        h1 { color: #2b6cb0; margin-top: 0; font-size: 10px; }
+        .header-status { display: flex; justify-content: space-between; font-size: 16px; font-weight: bold; margin-bottom: 10px; background: #ebf8ff; padding: 12px 20px; border-radius: 10px; color: #2c5282; }
+        .timer-bar-container { width: 100%; background-color: #e2e8f0; height: 14px; border-radius: 7px; overflow: hidden; 18px
         .timer-bar { height: 100%; width: 100%; background-color: #4299e1; transition: width 0.1s linear, background-color 0.3s; }
-        .card { background-color: #f7fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 25px; margin-bottom: 20px; }
+        .card { background-color: #f7fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 25px; margin-bottom: 10px; }
         .question { font-size: 24px; font-weight: bold; margin-bottom: 20px; color: #1a202c; }
         .input-group { display: flex; justify-content: center; align-items: center; }
         input[type="number"] { width: 100px; height: 40px; text-align: center; font-size: 28px; font-weight: bold; border: 3px solid #cbd5e0; border-radius: 12px; outline: none; }
@@ -33,7 +33,7 @@
     <div id="gameBox">
         <div class="header-status">
             <div>เวลาเหลือ: <span id="timeText" style="color: #e53e3e;">60</span> วินาที</div>
-            <div>คะแนน:<span id="score">0</span> /div>
+            <div>คะแนน: <span id="score">0</span>/div>
         </div>
         <div class="timer-bar-container"><div class="timer-bar" id="timerBar"></div></div>
         <div class="card">
