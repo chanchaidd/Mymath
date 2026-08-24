@@ -3,40 +3,570 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Webpage</title>
+    <title>Math 1-Min Speed Challenge</title>
     <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --border: #334155;
+            --gold: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
+            padding: 1rem;
         }
-        .container {
+
+        .game-container {
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 1.25rem;
+            padding: 2rem;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
             text-align: center;
-            background-color: white;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
         }
-        img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            margin: 20px 0;
+
+        .screen {
+            display: none;
+            flex-direction: column;
+            gap: 1.25rem;
         }
+
+        .screen.active {
+            display: flex;
+        }
+
         h1 {
-            color: #333;
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #60a5fa, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* High Score Banner on Start Screen */
+        .best-score-banner {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px dashed var(--gold);
+            border-radius: 0.75rem;
+            padding: 0.6rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #fbbf24;
+            font-weight: 600;
+        }
+
+        /* Config Options */
+        .config-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            text-align: left;
+        }
+
+        .config-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+        }
+
+        .opt-btn {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.6rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .opt-btn.active {
+            border-color: var(--accent);
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.85rem 1.5rem;
+            border-radius: 0.75rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            margin-top: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        /* Game HUD */
+        .hud {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg);
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border);
+        }
+
+        .hud-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hud-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .hud-value {
+            font-size: 1.4rem;
+            font-weight: 800;
+        }
+
+        #timer { color: var(--gold); }
+        #score { color: var(--correct); }
+
+        /* Problem Section */
+        .problem-box {
+            font-size: 3.2rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            margin: 1rem 0;
+            min-height: 4.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .answer-input {
+            width: 100%;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 0.8rem;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text);
+            text-align: center;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .answer-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Flash Effects */
+        .flash-correct { animation: flashGreen 0.3s forwards; }
+        .flash-wrong { animation: flashRed 0.3s forwards; }
+
+        @keyframes flashGreen {
+            0% { border-color: var(--border); }
+            50% { border-color: var(--correct); box-shadow: 0 0 15px rgba(34, 197, 94, 0.4); }
+            100% { border-color: var(--border); }
+        }
+
+        @keyframes flashRed {
+            0% { border-color: var(--border); }
+            50% { border-color: var(--wrong); box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
+            100% { border-color: var(--border); }
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+
+        .stat-card {
+            background: var(--bg);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .stat-val {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .new-record-badge {
+            display: none;
+            background: var(--gold);
+            color: #000;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 0.25rem 0.6rem;
+            border-radius: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 0 auto;
+            animation: bounce 0.6s infinite alternate;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-4px); }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Welcome to My Webpage</h1>
-        <img src="https://via.placeholder.com/400x300?text=Sample+Image" alt="Sample image">
-        <p>This is a basic HTML page with an image.</p>
+
+    <div class="game-container">
+        <!-- START SCREEN -->
+        <div id="start-screen" class="screen active">
+            <h1>1-Min Speed Math</h1>
+            <p>Solve as many arithmetic problems as you can in 60 seconds.</p>
+
+            <div class="best-score-banner">
+                <span>🏆 Personal Best</span>
+                <span id="start-high-score">0 pts</span>
+            </div>
+            
+            <div class="config-group">
+                <label>Operation</label>
+                <div class="button-grid" id="op-options">
+                    <button class="opt-btn active" data-val="add">+</button>
+                    <button class="opt-btn" data-val="sub">−</button>
+                    <button class="opt-btn" data-val="mul">×</button>
+                    <button class="opt-btn" data-val="div">÷</button>
+                    <button class="opt-btn" data-val="mix" style="grid-column: span 2;">Mix All</button>
+                </div>
+            </div>
+
+            <div class="config-group">
+                <label>Difficulty</label>
+                <div class="button-grid" id="diff-options">
+                    <button class="opt-btn active" data-val="easy">Easy</button>
+                    <button class="opt-btn" data-val="medium">Medium</button>
+                    <button class="opt-btn" data-val="hard">Hard</button>
+                </div>
+            </div>
+
+            <button class="btn-primary" id="start-btn">Start Challenge</button>
+        </div>
+
+        <!-- GAMEPLAY SCREEN -->
+        <div id="game-screen" class="screen">
+            <div class="hud">
+                <div class="hud-item">
+                    <span class="hud-label">Time Left</span>
+                    <span id="timer" class="hud-value">60s</span>
+                </div>
+                <div class="hud-item">
+                    <span class="hud-label">Score</span>
+                    <span id="score" class="hud-value">0</span>
+                </div>
+            </div>
+
+            <div id="problem" class="problem-box">0 + 0</div>
+
+            <input type="number" id="answer-input" class="answer-input" placeholder="?" autocomplete="off" autofocus />
+        </div>
+
+        <!-- RESULTS SCREEN -->
+        <div id="result-screen" class="screen">
+            <div id="record-badge" class="new-record-badge">🎉 New High Score!</div>
+            <h1>Time's Up!</h1>
+            <p>Here is how you performed:</p>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="hud-label">Final Score</span>
+                    <span id="res-score" class="stat-val" style="color: var(--accent);">0</span>
+                </div>
+                <div class="stat-card">
+                    <span class="hud-label">Best Record</span>
+                    <span id="res-high-score" class="stat-val" style="color: var(--gold);">0</span>
+                </div>
+                <div class="stat-card">
+                    <span class="hud-label">Accuracy</span>
+                    <span id="res-acc" class="stat-val" style="color: var(--correct);">0%</span>
+                </div>
+                <div class="stat-card">
+                    <span class="hud-label">Avg Speed</span>
+                    <span id="res-speed" class="stat-val" style="color: #f59e0b;">0s</span>
+                </div>
+            </div>
+
+            <button class="btn-primary" id="restart-btn">Play Again</button>
+        </div>
     </div>
+
+    <script>
+        // State Variables
+        let selectedOp = 'add';
+        let selectedDiff = 'easy';
+        let score = 0;
+        let totalAttempts = 0;
+        let timeLeft = 60;
+        let timerInterval = null;
+        let currentAnswer = 0;
+
+        // DOM Elements
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const resultScreen = document.getElementById('result-screen');
+
+        const opButtons = document.querySelectorAll('#op-options .opt-btn');
+        const diffButtons = document.querySelectorAll('#diff-options .opt-btn');
+
+        const startBtn = document.getElementById('start-btn');
+        const restartBtn = document.getElementById('restart-btn');
+
+        const problemBox = document.getElementById('problem');
+        const answerInput = document.getElementById('answer-input');
+        const timerDisplay = document.getElementById('timer');
+        const scoreDisplay = document.getElementById('score');
+
+        const startHighScoreDisplay = document.getElementById('start-high-score');
+        const resHighScoreDisplay = document.getElementById('res-high-score');
+        const recordBadge = document.getElementById('record-badge');
+
+        // Local Storage Helpers
+        function getStorageKey() {
+            return `speed_math_highscore_${selectedOp}_${selectedDiff}`;
+        }
+
+        function loadHighScore() {
+            const key = getStorageKey();
+            const savedScore = localStorage.getItem(key);
+            return savedScore ? parseInt(savedScore, 10) : 0;
+        }
+
+        function saveHighScore(newScore) {
+            const key = getStorageKey();
+            localStorage.setItem(key, newScore.toString());
+        }
+
+        function updateStartHighScoreDisplay() {
+            const currentBest = loadHighScore();
+            startHighScoreDisplay.textContent = `${currentBest} pts`;
+        }
+
+        // Setup Selection Handlers
+        function setupToggleButtons(buttons, callback) {
+            buttons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    buttons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    callback(btn.dataset.val);
+                    updateStartHighScoreDisplay();
+                });
+            });
+        }
+
+        setupToggleButtons(opButtons, val => selectedOp = val);
+        setupToggleButtons(diffButtons, val => selectedDiff = val);
+
+        // Initial High Score Load
+        updateStartHighScoreDisplay();
+
+        // Navigation
+        function showScreen(screen) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            screen.classList.add('active');
+        }
+
+        // Random Number Generators
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function generateProblem() {
+            let op = selectedOp;
+            if (op === 'mix') {
+                const ops = ['add', 'sub', 'mul', 'div'];
+                op = ops[Math.floor(Math.random() * ops.length)];
+            }
+
+            let num1, num2, symbol;
+            let range = { easy: [1, 10], medium: [5, 25], hard: [10, 100] }[selectedDiff];
+
+            switch (op) {
+                case 'add':
+                    symbol = '+';
+                    num1 = getRandomInt(range[0], range[1]);
+                    num2 = getRandomInt(range[0], range[1]);
+                    currentAnswer = num1 + num2;
+                    break;
+                case 'sub':
+                    symbol = '−';
+                    num1 = getRandomInt(range[0], range[1]);
+                    num2 = getRandomInt(range[0], range[1]);
+                    if (num1 < num2) [num1, num2] = [num2, num1];
+                    currentAnswer = num1 - num2;
+                    break;
+                case 'mul':
+                    symbol = '×';
+                    let mulRange = { easy: [2, 9], medium: [4, 12], hard: [6, 20] }[selectedDiff];
+                    num1 = getRandomInt(mulRange[0], mulRange[1]);
+                    num2 = getRandomInt(mulRange[0], mulRange[1]);
+                    currentAnswer = num1 * num2;
+                    break;
+                case 'div':
+                    symbol = '÷';
+                    let divRange = { easy: [2, 9], medium: [3, 12], hard: [4, 15] }[selectedDiff];
+                    num2 = getRandomInt(divRange[0], divRange[1]);
+                    currentAnswer = getRandomInt(divRange[0], divRange[1]);
+                    num1 = num2 * currentAnswer;
+                    break;
+            }
+
+            problemBox.textContent = `${num1} ${symbol} ${num2}`;
+        }
+
+        // Input Evaluation
+        answerInput.addEventListener('input', () => {
+            const val = parseInt(answerInput.value, 10);
+            if (isNaN(val)) return;
+
+            if (val === currentAnswer) {
+                score++;
+                totalAttempts++;
+                scoreDisplay.textContent = score;
+                triggerFlash('flash-correct');
+                answerInput.value = '';
+                generateProblem();
+            } else if (val.toString().length >= currentAnswer.toString().length) {
+                triggerFlash('flash-wrong');
+            }
+        });
+
+        function triggerFlash(className) {
+            answerInput.classList.remove('flash-correct', 'flash-wrong');
+            void answerInput.offsetWidth;
+            answerInput.classList.add(className);
+        }
+
+        // Game Loop
+        function startGame() {
+            score = 0;
+            totalAttempts = 0;
+            timeLeft = 60;
+            
+            scoreDisplay.textContent = '0';
+            timerDisplay.textContent = '60s';
+            answerInput.value = '';
+
+            showScreen(gameScreen);
+            answerInput.focus();
+
+            generateProblem();
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = `${timeLeft}s`;
+
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function endGame() {
+            clearInterval(timerInterval);
+            
+            const previousHighScore = loadHighScore();
+            let isNewRecord = false;
+
+            if (score > previousHighScore) {
+                saveHighScore(score);
+                isNewRecord = true;
+            }
+
+            const currentHighScore = Math.max(score, previousHighScore);
+            const accuracy = totalAttempts > 0 ? Math.round((score / totalAttempts) * 100) : 0;
+            const avgSpeed = score > 0 ? (60 / score).toFixed(1) : '0';
+
+            document.getElementById('res-score').textContent = score;
+            resHighScoreDisplay.textContent = currentHighScore;
+            document.getElementById('res-acc').textContent = `${accuracy}%`;
+            document.getElementById('res-speed').textContent = `${avgSpeed}s`;
+
+            if (isNewRecord && score > 0) {
+                recordBadge.style.display = 'block';
+            } else {
+                recordBadge.style.display = 'none';
+            }
+
+            updateStartHighScoreDisplay();
+            showScreen(resultScreen);
+        }
+
+        // Event Listeners
+        startBtn.addEventListener('click', startGame);
+        restartBtn.addEventListener('click', () => showScreen(startScreen));
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && gameScreen.classList.contains('active')) {
+                const val = parseInt(answerInput.value, 10);
+                if (!isNaN(val) && val !== currentAnswer) {
+                    totalAttempts++;
+                    triggerFlash('flash-wrong');
+                    answerInput.value = '';
+                }
+            }
+        });
+    </script>
 </body>
 </html>
