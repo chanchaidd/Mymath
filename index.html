@@ -1,4 +1,7 @@
 
+
+
+     
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -97,8 +100,7 @@
         }
         setTimeout(() => { if (timeLeft > 0) generateQuestion(); }, 400);
     }
-
-    function endGame() {
+      function endGame() {
         userAns.disabled = true;
         document.getElementById('gameBox').style.display = 'none';
         document.getElementById('resultBox').style.display = 'block';
@@ -126,4 +128,4 @@
     generateQuestion(); startOverallTimer();
 </script>
 </body>
-</html>
+</html>                          
