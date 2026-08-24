@@ -1,1 +1,132 @@
 
+
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกมคณิตศาสตร์: ตะลุยโจทย์เลข 10 (จับเวลา 1 นาที)</title>
+    <style>
+        * { box-sizing: border-box; font-family: 'Sarabun', 'Tahoma', sans-serif; }
+        body { background-color: #f0f4f8; color: #2d3748; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { background: #ffffff; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 500px; width: 100%; padding: 30px; text-align: center; }
+        h1 { color: #2b6cb0; margin-top: 0; font-size: 24px; }
+        .header-status { display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; margin-bottom: 20px; background: #ebf8ff; padding: 12px 20px; border-radius: 10px; color: #2c5282; }
+        .timer-bar-container { width: 100%; background-color: #e2e8f0; height: 14px; border-radius: 7px; overflow: hidden; margin-bottom: 25px; }
+        .timer-bar { height: 100%; width: 100%; background-color: #4299e1; transition: width 0.1s linear, background-color 0.3s; }
+        .card { background-color: #f7fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 25px; margin-bottom: 20px; }
+        .question { font-size: 34px; font-weight: bold; margin-bottom: 20px; color: #1a202c; }
+        .input-group { display: flex; justify-content: center; align-items: center; }
+        input[type="number"] { width: 100px; height: 60px; text-align: center; font-size: 28px; font-weight: bold; border: 3px solid #cbd5e0; border-radius: 12px; outline: none; }
+        .feedback { font-size: 20px; font-weight: bold; min-height: 30px; margin-top: 15px; }
+        .correct { color: #38a169; }
+        .wrong { color: #e53e3e; }
+        .result-box { display: none; }
+        .restart-btn { background-color: #38a169; color: white; border: none; padding: 12px 30px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>⏱️ ตะลุยโจทย์เลข 10 (จับเวลา 1 นาที)</h1>
+    <div id="gameBox">
+        <div class="header-status">
+            <div>เวลาเหลือ: <span id="timeText" style="color: #e53e3e;">60</span> วินาที</div>
+            <div>คะแนน: <span id="score">0</span></div>
+        </div>
+        <div class="timer-bar-container"><div class="timer-bar" id="timerBar"></div></div>
+        <div class="card">
+            <div class="question" id="qText">3 + ? = 10</div>
+            <div class="input-group">
+                <input type="number" id="userAns" min="0" max="10" placeholder="?" autofocus>
+            </div>
+            <div class="feedback" id="feedback"></div>
+        </div>
+    </div>
+
+    <div class="result-box" id="resultBox">
+        <h2>🎉 หมดเวลาแล้ว!</h2>
+        <p style="font-size: 22px;">ตอบถูก: <strong id="finalScore" style="color: #38a169; font-size: 32px;">0</strong> / <span id="totalQuestions" style="color: #2b6cb0; font-size: 28px; font-weight: bold;">0</span> ข้อ</p>
+        <p style="font-size: 18px; color: #4a5568;">ความแม่นยำ: <strong id="accuracyText" style="color: #d69e2e;">0%</strong></p>
+        <p id="finalFeedback" style="font-size: 18px; color: #4a5568;"></p>
+        <button class="restart-btn" onclick="restartGame()">เริ่มเล่นใหม่</button>
+    </div>
+</div>
+
+<script>
+    const TOTAL_TIME = 60;
+    let score = 0, totalAttempted = 0, timeLeft = TOTAL_TIME, mainTimer = null, currentNum1 = 0, currentAns = 0;
+    const qText = document.getElementById('qText'), userAns = document.getElementById('userAns'), feedback = document.getElementById('feedback'), timeText = document.getElementById('timeText'), scoreText = document.getElementById('score'), timerBar = document.getElementById('timerBar');
+
+    function generateQuestion() {
+        currentNum1 = Math.floor(Math.random() * 11);
+        currentAns = 10 - currentNum1;
+        qText.textContent = `${currentNum1} + ? = 10`;
+        userAns.value = ''; userAns.disabled = false;
+        userAns.style.borderColor = '#cbd5e0'; userAns.style.backgroundColor = '#ffffff';
+        userAns.focus(); feedback.textContent = '';
+    }
+
+    function startOverallTimer() {
+        clearInterval(mainTimer);
+        mainTimer = setInterval(() => {
+            timeLeft -= 0.1;
+            updateTimerDisplay();
+            if (timeLeft <= 0) { clearInterval(mainTimer); endGame(); }
+        }, 100);
+    }
+
+    function updateTimerDisplay() {
+        timeText.textContent = Math.max(0, Math.ceil(timeLeft));
+        const pct = (timeLeft / TOTAL_TIME) * 100;
+        timerBar.style.width = `${Math.max(0, pct)}%`;
+        timerBar.style.backgroundColor = pct < 25 ? '#e53e3e' : (pct < 50 ? '#dd6b20' : '#4299e1');
+    }
+
+    function checkInstantAnswer() {
+        if (userAns.disabled || userAns.value === '' || timeLeft <= 0) return;
+        const val = parseInt(userAns.value, 10);
+        if (currentAns === 10 && val < 10) return;
+
+        userAns.disabled = true; totalAttempted++;
+        if (val === currentAns) {
+            score++; scoreText.textContent = score;
+            feedback.textContent = '✅ ถูกต้อง!'; feedback.className = 'feedback correct';
+            userAns.style.borderColor = '#38a169'; userAns.style.backgroundColor = '#f0fff4';
+        } else {
+            feedback.textContent = `❌ ผิด! คำตอบคือ ${currentAns}`; feedback.className = 'feedback wrong';
+            userAns.style.borderColor = '#e53e3e'; userAns.style.backgroundColor = '#fff5f5';
+        }
+        setTimeout(() => { if (timeLeft > 0) generateQuestion(); }, 400);
+    }
+
+    function endGame() {
+        userAns.disabled = true;
+        document.getElementById('gameBox').style.display = 'none';
+        document.getElementById('resultBox').style.display = 'block';
+        document.getElementById('finalScore').textContent = score;
+        document.getElementById('totalQuestions').textContent = totalAttempted;
+        const accuracy = totalAttempted > 0 ? Math.round((score / totalAttempted) * 100) : 0;
+        document.getElementById('accuracyText').textContent = `${accuracy}%`;
+        
+        const fb = document.getElementById('finalFeedback');
+        if (score >= 25 && accuracy >= 90) fb.textContent = '🔥 สุดยอดมาก! ความไวและความแม่นยำระดับเซียน';
+        else if (score >= 15) fb.textContent = '👏 เก่งมาก! ทำความเร็วได้ดีมาก';
+        else if (score >= 8) fb.textContent = '👍 ดีมาก! ฝึกฝนบ่อยๆ จะไวขึ้นอีกนะ';
+        else fb.textContent = '💪 พยายามอีกนิด ลองสปีดใหม่อีกรอบ!';
+    }
+
+    function restartGame() {
+        score = 0; totalAttempted = 0; timeLeft = TOTAL_TIME;
+        scoreText.textContent = score;
+        document.getElementById('gameBox').style.display = 'block';
+        document.getElementById('resultBox').style.display = 'none';
+        generateQuestion(); startOverallTimer();
+    }
+
+    userAns.addEventListener("input", checkInstantAnswer);
+    generateQuestion(); startOverallTimer();
+</script>
+</body>
+</html>
