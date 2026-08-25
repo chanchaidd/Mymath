@@ -1,6 +1,8 @@
 
 
 
+
+
      
 <!DOCTYPE html>
 <html lang="th">
@@ -104,7 +106,7 @@
         userAns.disabled = true;
         document.getElementById('gameBox').style.display = 'none';
         document.getElementById('resultBox').style.display = 'block';
-        document.getElementById('finalScore').textContent = score;
+        document.('finalScore').textContent = score;
         document.getElementById('totalQuestions').textContent = totalAttempted;
         const accuracy = totalAttempted > 0 ? Math.round((score / totalAttempted) * 100) : 0;
         document.getElementById('accuracyText').textContent = `${accuracy}%`;
@@ -129,3 +131,4 @@
 </script>
 </body>
 </html>                          
+
